@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html manifest="psfree_lapse.cache">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayStation Pulse PSFree Host 9.00 - Installing Cache</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(0deg, #010101 0%, #270A5A 100%);
+            color: #FDFDFD;
+            font-family: -webkit-system-font, system-ui, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .cache-container {
+            text-align: center;
+            max-width: 500px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FDFDFD;
+            margin-bottom: 12px;
+            text-shadow: 0 0 15px rgba(253, 253, 253, 0.3);
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: rgba(253, 253, 253, 0.7);
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .progress-container {
+            margin: 30px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 7px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #621FDB, #D6BBFB);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 7px;
+        }
+
+        .progress-text {
+            font-size: 16px;
+            color: #FDFDFD;
+            margin-bottom: 10px;
+        }
+
+        .progress-percent {
+            font-size: 24px;
+            color: #1BFACC;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(27, 250, 204, 0.3);
+        }
+
+        .status-message {
+            font-size: 14px;
+            color: rgba(253, 253, 253, 0.7);
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border: 1.5px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.05);
+            border-top: 3px solid #1BFACC;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #1BFACC;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            display: none;
+        }
+
+        .success-icon::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            width: 12px;
+            height: 20px;
+            border: solid #1BFACC;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        /* PS4 Browser Optimizations */
+        * {
+            -webkit-transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+    <script>
+        history.replaceState(null, null, 'index.html');
+        var histlength = history.length;
+        history.go(-histlength);
+
+        let currentPercent = 0;
+        let isComplete = false;
+        let totalFiles = 21; // Total files in cache manifest
+        let cachedFiles = 0;
+        let progressEvents = 0;
+
+        function updateProgress(percent) {
+            currentPercent = percent;
+            const progressFill = document.querySelector('.progress-fill');
+            const progressPercent = document.querySelector('.progress-percent');
+            
+            if (progressFill) {
+                progressFill.style.width = percent + '%';
+            }
+            if (progressPercent) {
+                progressPercent.textContent = percent + '%';
+            }
+        }
+
+        function DLProgress(e) {
+            progressEvents++;
+            
+            // Each progress event represents a file being processed
+            // Calculate progress based on number of files cached
+            cachedFiles = Math.min(progressEvents, totalFiles);
+            const percent = Math.round((cachedFiles / totalFiles) * 100);
+            
+            updateProgress(percent);
+            
+            const statusMessage = document.querySelector('.status-message');
+            if (statusMessage) {
+                if (cachedFiles < totalFiles) {
+                    statusMessage.textContent = `Caching files... (${cachedFiles}/${totalFiles} files)`;
+                } else {
+                    statusMessage.textContent = `All files cached (${totalFiles}/${totalFiles} files)`;
+                }
+            }
+        }
+
+        function DisplayCacheProgress() {
+            if (isComplete) return;
+            isComplete = true;
+            
+            updateProgress(100);
+            
+            const progressText = document.querySelector('.progress-text');
+            const statusMessage = document.querySelector('.status-message');
+            const spinner = document.querySelector('.spinner');
+            const successIcon = document.querySelector('.success-icon');
+            
+            if (progressText) {
+                progressText.textContent = 'Cache Installation Complete!';
+            }
+            
+            if (statusMessage) {
+                statusMessage.textContent = 'Offline cache installed successfully. Redirecting to exploit...';
+            }
+            
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+            
+            if (successIcon) {
+                successIcon.style.display = 'block';
+            }
+            
+            setTimeout(function() {
+                window.location.replace('index.html');
+            }, 2000);
+        }
+
+        // Event listeners for application cache
+        window.addEventListener('load', function() {
+            if (window.applicationCache) {
+                window.applicationCache.addEventListener('progress', DLProgress, false);
+                window.applicationCache.addEventListener('cached', DisplayCacheProgress, false);
+                window.applicationCache.addEventListener('updateready', DisplayCacheProgress, false);
+                window.applicationCache.addEventListener('error', function() {
+                    const statusMessage = document.querySelector('.status-message');
+                    if (statusMessage) {
+                        statusMessage.textContent = 'Cache installation failed. Continuing anyway...';
+                        statusMessage.style.color = '#ff6b6b';
+                    }
+                    setTimeout(function() {
+                        window.location.replace('index.html');
+                    }, 3000);
+                }, false);
+                
+                // Start fallback progress if no progress events are received within 2 seconds
+                setTimeout(function() {
+                    if (progressEvents === 0 && !isComplete) {
+                        console.log('No progress events received, starting fallback');
+                        window.fallbackStarted = true;
+                        
+                        const fallbackInterval = setInterval(function() {
+                            if (isComplete) {
+                                clearInterval(fallbackInterval);
+                                return;
+                            }
+                            
+                            // Simulate file-by-file progress
+                            cachedFiles = Math.min(cachedFiles + 1, totalFiles - 1);
+                            const percent = Math.round((cachedFiles / totalFiles) * 100);
+                            
+                            updateProgress(percent);
+                            
+                            const statusMessage = document.querySelector('.status-message');
+                            if (statusMessage) {
+                                statusMessage.textContent = `Caching files... (${cachedFiles}/${totalFiles} files)`;
+                            }
+                        }, 1000);
+                    }
+                }, 2000);
+            }
+        });
+
+        // Prevent context menu and selection
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+        });
+    </script>
+</head>
+<body>
+    <div class="cache-container">
+        <h1 class="title">PlayStation Pulse PSFree Host 9.00</h1>
+        <p class="subtitle">Installing Offline Cache</p>
+        
+        <div class="progress-container">
+            <div class="progress-text">Preparing cache installation...</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="progress-percent">0%</div>
+        </div>
+        
+        <div class="spinner"></div>
+        <div class="success-icon"></div>
+        
+        <div class="status-message">
+            Initializing offline cache for PS4 browser compatibility...
+        </div>
+    </div>
+</body>
+</html>
